@@ -11,6 +11,8 @@ The track's arc (quiet opening, a long swell, letting go at the end) is the game
 lonely start, warmth that grows with every person you reach, and a release.
 
 - Play: open `web/index.html` (mouse or arrow keys).
+- Mac build: `./mac/build.sh` makes `dist/Thread-mac.zip` (universal .app, native WKWebView shell around `web/`).
+  Self-check: `THREAD_SNAPSHOT=/tmp/t.png dist/Thread.app/Contents/MacOS/Thread` renders the game to a PNG and quits.
 - Check: `node tests/reach.mjs` proves every level is solvable on 5 screen sizes.
 - Music: original, generated live with the Web Audio API in F minor at 80 BPM. The theme track is not included.
 
