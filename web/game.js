@@ -37,6 +37,7 @@ function startAudio() {
   const fb = ac.createGain(); fb.gain.value = 0.32;
   master.connect(ac.destination); master.connect(verb); verb.connect(fb).connect(verb); fb.connect(ac.destination);
   nextBar = ac.currentTime + 0.1;
+  if (REC) try { startRecording([master, fb]); } catch (e) { fetch('/log?' + encodeURIComponent(e)); }
 }
 function scheduleMusic() {
   if (!ac) return;
@@ -114,6 +115,23 @@ function autopilot() {
   if (d > 0.5) { needle.tx += dx / d * s; needle.ty += dy / d * s; }
 }
 
+// ---------- ?record: canvas + music in one webm, POSTed to /upload (walkthrough video with sound) ----------
+const REC = /record/.test(location.search);
+let rec = null;
+function startRecording(nodes) {
+  const dest = ac.createMediaStreamDestination();
+  nodes.forEach(n => n.connect(dest));
+  const stream = new MediaStream([...cv.captureStream(60).getVideoTracks(), ...dest.stream.getAudioTracks()]);
+  const chunks = [];
+  const mimeType = ['video/webm;codecs=vp9,opus', 'video/webm;codecs=vp8,opus', 'video/webm', 'video/mp4']
+    .find(t => MediaRecorder.isTypeSupported(t));
+  rec = new MediaRecorder(stream, { mimeType, videoBitsPerSecond: 12e6 });
+  rec.ondataavailable = e => chunks.push(e.data);
+  rec.onstop = () => fetch('/upload', { method: 'POST', body: new Blob(chunks, { type: 'video/webm' }) })
+    .then(r => { document.title = 'uploaded ' + r.status; });
+  rec.start(1000);
+}
+
 // ---------- update ----------
 function update(dt) {
   stateT += dt; scheduleMusic();
@@ -123,6 +141,7 @@ function update(dt) {
       wins.forEach((w, i) => w.lift += dt * (0.10 + i * 0.015));
       if (stateT > 5) { if (lv + 1 < LEVELS.length) loadLevel(++lv); else { state = 'end'; stateT = 0; } }
     }
+    if (state === 'end' && rec && rec.state === 'recording' && stateT > 5) rec.stop();
     return;
   }
   if (AUTO) autopilot();

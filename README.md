@@ -10,7 +10,8 @@ the houses lift into the sky together.
 The track's arc (quiet opening, a long swell, letting go at the end) is the game's arc: a cold,
 lonely start, warmth that grows with every person you reach, and a release.
 
-- Play: open `web/index.html` (mouse or arrow keys). `web/index.html?autoplay` plays itself (attract mode; used to record the walkthrough).
+- Play: open `web/index.html` (mouse or arrow keys). `web/index.html?autoplay` plays itself (attract mode). `?autoplay&record` also records the canvas and the music into one webm and POSTs it to `/upload` (how the walkthrough video with sound was made).
+- Walkthrough video (with the music): https://github.com/DesignMaster-Solutions/thread-tgj02/releases/download/v0.3/thread-walkthrough-v2.mp4
 - itch.io: https://designmastersolutions.itch.io/thread
 - Mac build: `./mac/build.sh` makes `dist/Thread-mac.zip` (universal .app, native WKWebView shell around `web/`).
   Self-check: `THREAD_SNAPSHOT=/tmp/t.png dist/Thread.app/Contents/MacOS/Thread` renders the game to a PNG and quits.
