@@ -90,6 +90,30 @@ function begin() {
   else if (state === 'end' && stateT > 3) { state = 'title'; stateT = 0; }
 }
 
+// ---------- autoplay (?autoplay): attract mode, also used to record the walkthrough ----------
+const AUTO = /autoplay/.test(location.search);
+let route = null;
+function planRoute() { // same search as tests/reach.mjs: an order where each window is in reach of the last anchor
+  const R0 = Math.min(W, H) * 1.6, out = [];
+  const go = (at, r) => {
+    if (out.length === wins.length) return true;
+    for (const w of wins) {
+      if (out.includes(w) || Math.hypot(w.fx * W - at.x, w.fy * H - at.y) > r * R0 + 26) continue;
+      out.push(w); if (go(P(w), r + 0.03)) return true; out.pop();
+    }
+    return false;
+  };
+  go(P(anchors[0]), reach);
+  return out;
+}
+function autopilot() {
+  if (!route || route.wins !== wins) { route = planRoute(); route.wins = wins; }
+  const w = route.find(w => !w.lit);
+  if (!w) return;
+  const p = P(w), dx = p.x - needle.tx, dy = p.y - needle.ty, d = Math.hypot(dx, dy), s = Math.min(d, 4);
+  if (d > 0.5) { needle.tx += dx / d * s; needle.ty += dy / d * s; }
+}
+
 // ---------- update ----------
 function update(dt) {
   stateT += dt; scheduleMusic();
@@ -101,6 +125,7 @@ function update(dt) {
     }
     return;
   }
+  if (AUTO) autopilot();
   const k = 520 * dt;
   if (keys.ArrowLeft || keys.a) needle.tx -= k; if (keys.ArrowRight || keys.d) needle.tx += k;
   if (keys.ArrowUp || keys.w) needle.ty -= k; if (keys.ArrowDown || keys.s) needle.ty += k;
