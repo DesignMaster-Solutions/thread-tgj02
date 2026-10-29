@@ -15,6 +15,8 @@ lonely start, warmth that grows with every person you reach, and a release.
 - itch.io: https://designmastersolutions.itch.io/thread
 - Mac build: `./mac/build.sh` makes `dist/Thread-mac.zip` (universal .app, native WKWebView shell around `web/`).
   Self-check: `THREAD_SNAPSHOT=/tmp/t.png dist/Thread.app/Contents/MacOS/Thread` renders the game to a PNG and quits.
+- Windows build: `./win/build.sh` makes `dist/Thread-windows.zip` (Electron win32-x64 around the same `web/`; unzip and run `Thread.exe`, F11 toggles fullscreen).
+  Self-check: `THREAD_SNAPSHOT=C:\\t.png Thread.exe` renders the game to a PNG and quits.
 - Check: `node tests/reach.mjs` proves every level is solvable on 5 screen sizes.
 - Music: original, generated live with the Web Audio API in F minor at 80 BPM. The theme track is not included.
 
