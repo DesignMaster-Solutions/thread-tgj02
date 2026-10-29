@@ -77,6 +77,8 @@ function loadLevel(i) {
   needle.x = needle.tx = anchors[0].fx * W; needle.y = needle.ty = anchors[0].fy * H;
 }
 const P = o => ({ x: o.fx * W, y: o.fy * H });
+// houses (and the people in them) grow on big screens: at 1600 px they were drawn at phone size
+const houseK = () => Math.max(1, Math.min(1.6, Math.min(W, H) / 560));
 function shutterOpen(w) { return !w.shut || (songBeat() % 4) < 2; }
 
 // ---------- input ----------
@@ -157,7 +159,7 @@ function update(dt) {
   wins.forEach((w, i) => {
     if (w.lit) { w.lit = Math.min(1, w.lit + dt * 1.5); return; }
     const p = P(w);
-    if (Math.hypot(needle.x - p.x, needle.y - p.y) < 26 && shutterOpen(w)) {
+    if (Math.hypot(needle.x - p.x, needle.y - p.y) < 26 * houseK() && shutterOpen(w)) {
       w.lit = 0.01; anchors.push(w); reach += 0.03; layers++; total++;
       stitchSound(total);
     }
@@ -170,8 +172,9 @@ function sag(a, b, amt) {
   g.moveTo(a.x, a.y);
   g.quadraticCurveTo((a.x + b.x) / 2, Math.max(a.y, b.y) + amt, b.x, b.y);
 }
-function house(p, w, warm) {
-  const bw = 70, bh = 64, lift = w.lift * H;
+function house(p0, w, warm) {
+  g.save(); g.translate(p0.x, p0.y - w.lift * H); g.scale(houseK(), houseK());
+  const p = { x: 0, y: 0 }, bw = 70, bh = 64, lift = 0;
   const x = p.x - bw / 2, y = p.y - 18 - lift;
   g.fillStyle = `rgb(${30 + warm * 40},${34 + warm * 22},${58 - warm * 10})`;
   g.fillRect(x, y, bw, bh);
@@ -189,6 +192,7 @@ function house(p, w, warm) {
   if (glow) person(p.x, p.y - lift, w, glow);
   if (!open) { g.fillStyle = '#5a4a3a'; g.fillRect(p.x - 15, p.y - 15 - lift, 30, 30); g.fillStyle = '#463a2e'; g.fillRect(p.x - 1, p.y - 15 - lift, 2, 30); }
   else if (w.shut && !w.lit) { g.strokeStyle = 'rgba(255,220,160,.6)'; g.lineWidth = 2; g.strokeRect(p.x - 16, p.y - 16 - lift, 32, 32); }
+  g.restore();
 }
 // the person behind a stitched window: adult, child or a couple (fixed per window), fades in with
 // the glow and waves once the window is fully warm
