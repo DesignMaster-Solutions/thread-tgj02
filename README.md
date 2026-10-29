@@ -11,7 +11,7 @@ The track's arc (quiet opening, a long swell, letting go at the end) is the game
 lonely start, warmth that grows with every person you reach, and a release.
 
 - Play: open `web/index.html` (mouse or arrow keys). `web/index.html?autoplay` plays itself (attract mode). `?autoplay&record` also records the canvas and the music into one webm and POSTs it to `/upload` (how the walkthrough video with sound was made).
-- Walkthrough video (with the music): https://youtu.be/P2Wte2zimlI (file: `docs/walkthrough.mp4`)
+- Walkthrough video (with the music): https://youtu.be/Cnu-77DVhfM (file: `docs/walkthrough.mp4`, re-recorded with the people in the windows)
 - itch.io: https://designmastersolutions.itch.io/thread
 - Mac build: `./mac/build.sh` makes `dist/Thread-mac.zip` (universal .app, native WKWebView shell around `web/`).
   Self-check: `THREAD_SNAPSHOT=/tmp/t.png dist/Thread.app/Contents/MacOS/Thread` renders the game to a PNG and quits.
