@@ -186,8 +186,29 @@ function house(p, w, warm) {
   }
   g.fillStyle = glow ? `rgb(255,${180 + glow * 30},${100 + glow * 40})` : '#3a4466';
   g.fillRect(p.x - 13, p.y - 13 - lift, 26, 26);
+  if (glow) person(p.x, p.y - lift, w, glow);
   if (!open) { g.fillStyle = '#5a4a3a'; g.fillRect(p.x - 15, p.y - 15 - lift, 30, 30); g.fillStyle = '#463a2e'; g.fillRect(p.x - 1, p.y - 15 - lift, 2, 30); }
   else if (w.shut && !w.lit) { g.strokeStyle = 'rgba(255,220,160,.6)'; g.lineWidth = 2; g.strokeRect(p.x - 16, p.y - 16 - lift, 32, 32); }
+}
+// the person behind a stitched window: adult, child or a couple (fixed per window), fades in with
+// the glow and waves once the window is fully warm
+function person(cx, cy, w, a) {
+  const kind = Math.floor((w.fx * 97 + w.fy * 53) * 10) % 3;
+  const bob = a >= 1 ? Math.sin(performance.now() / 260 + w.fx * 20) * 1.2 : 0;
+  g.save(); g.beginPath(); g.rect(cx - 13, cy - 13, 26, 26); g.clip();
+  g.fillStyle = `rgba(72,38,22,${0.85 * a})`;
+  const one = (dx, s, wave) => {
+    const by = cy + 13, hy = by - 13 * s + (wave ? bob : 0);
+    g.beginPath(); g.ellipse(cx + dx, by, 7 * s, 8 * s, 0, Math.PI, 0); g.fill();
+    g.beginPath(); g.arc(cx + dx, hy, 4 * s, 0, 7); g.fill();
+    if (wave && a >= 1) { // raised hand
+      g.beginPath(); g.ellipse(cx + dx + 8 * s, by - 13 * s - bob * 2, 1.8 * s, 3.2 * s, 0.3, 0, 7); g.fill();
+    }
+  };
+  if (kind === 0) one(0, 1, true);
+  else if (kind === 1) one(0, 0.72, true);
+  else { one(-5, 0.95, false); one(6, 0.8, true); }
+  g.restore();
 }
 function text(s, y, size, alpha) {
   g.globalAlpha = alpha; g.fillStyle = '#f3e6d0'; g.textAlign = 'center';
