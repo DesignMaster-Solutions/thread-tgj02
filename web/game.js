@@ -217,7 +217,7 @@ function house(p0, w, warm) {
   g.fillStyle = glow ? `rgb(255,${180 + glow * 30},${100 + glow * 40})` : '#3a4466';
   g.fillRect(p.x - 13, p.y - 13 - lift, 26, 26);
   if (glow) person(p.x, p.y - lift, w, glow);
-  if (w.say && w.sayT < 4) { // the person speaks once, above their house, and the words drift up and fade
+  if (w.say && w.sayT < 4 && state === 'play') { // the person speaks once, above their house, and the words drift up and fade
     w.sayT += 1 / 60; const a = Math.min(1, w.sayT * 2) * Math.min(1, (4 - w.sayT) / 1.2);
     g.globalAlpha = a; g.fillStyle = '#f3e6d0'; g.textAlign = 'center';
     g.font = "italic 15px Georgia, 'Times New Roman', serif"; // already scaled by houseK in this transform
