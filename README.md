@@ -18,6 +18,7 @@ lonely start, warmth that grows with every person you reach, and a release.
 - Windows build: `./win/build.sh` makes `dist/Thread-windows.zip` (Electron win32-x64 around the same `web/`; unzip and run `Thread.exe`, F11 toggles fullscreen).
   Self-check: `THREAD_SNAPSHOT=C:\\t.png Thread.exe` renders the game to a PNG and quits.
 - Check: `node tests/reach.mjs` proves every level is solvable on 5 screen sizes.
+- Whispers (0.6): each person speaks one short line when their window warms (22 windows, 22 lines, `web/game.js` WHISPERS); `node tests/whispers.mjs` checks one per window, unique, short enough to read. `?autoplay` now starts by itself after the title.
 - Music: original, generated live with the Web Audio API in F minor at 80 BPM. The theme track is not included.
 
 AI disclosure: the code was written with the help of an AI coding assistant (Claude). No AI-generated images or audio.

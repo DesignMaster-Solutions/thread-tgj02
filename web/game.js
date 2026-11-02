@@ -65,6 +65,31 @@ const LEVELS = [
     wins: [[.12, .55], [.25, .74, 1], [.38, .40], [.50, .66, 1], [.62, .36], [.74, .72, 1], [.86, .48], [.50, .22, 1]] },
 ];
 
+// What each person says when their window warms, in the order the windows are stitched (22 windows).
+const WHISPERS = [
+  'Oh. Someone came.',
+  'I left the light off. I did not think...',
+  'Tell me it is snowing where you are too.',
+  'I was just about to sleep.',
+  'My hands are warm again.',
+  'Is it you? It has been a long winter.',
+  'I kept the kettle on, just in case.',
+  'We stopped waving at the street years ago.',
+  'Stay a minute. Only a minute.',
+  'I can hear the music from here.',
+  'My son lives far from this town.',
+  'I counted the windows. Ours was last.',
+  'You found us anyway.',
+  'Look, the house across is lit too.',
+  'I will not close the shutter tonight.',
+  'I am not afraid of the dark now.',
+  'Thank you for the thread.',
+  'Can you hear them singing?',
+  'I knew this street when it was loud.',
+  'We are all a little closer.',
+  'Hold on to the end.',
+  'Everyone is here.',
+];
 let lv = 0, wins = [], anchors = [], reach = 0, state = 'title', stateT = 0, total = 0;
 const needle = { x: 0, y: 0, tx: 0, ty: 0 };
 const snow = Array.from({ length: 140 }, () => ({ x: Math.random(), y: Math.random(), s: Math.random() * 1.6 + 0.4, v: Math.random() * 0.02 + 0.01 }));
@@ -137,6 +162,7 @@ function startRecording(nodes) {
 // ---------- update ----------
 function update(dt) {
   stateT += dt; scheduleMusic();
+  if (AUTO && state === 'title' && stateT > 1.5) begin(); // attract mode starts by itself
   snow.forEach(s => { s.y += s.v * dt * (state === 'lift' ? -3 : 1); s.x += Math.sin(s.y * 9 + s.s) * 0.0004; if (s.y > 1) s.y = 0; if (s.y < 0) s.y = 1; });
   if (state !== 'play') {
     if (state === 'lift') {
@@ -161,6 +187,7 @@ function update(dt) {
     const p = P(w);
     if (Math.hypot(needle.x - p.x, needle.y - p.y) < 26 * houseK() && shutterOpen(w)) {
       w.lit = 0.01; anchors.push(w); reach += 0.03; layers++; total++;
+      w.say = WHISPERS[(total - 1) % WHISPERS.length]; w.sayT = 0;
       stitchSound(total);
     }
   });
@@ -190,6 +217,13 @@ function house(p0, w, warm) {
   g.fillStyle = glow ? `rgb(255,${180 + glow * 30},${100 + glow * 40})` : '#3a4466';
   g.fillRect(p.x - 13, p.y - 13 - lift, 26, 26);
   if (glow) person(p.x, p.y - lift, w, glow);
+  if (w.say && w.sayT < 4) { // the person speaks once, above their house, and the words drift up and fade
+    w.sayT += 1 / 60; const a = Math.min(1, w.sayT * 2) * Math.min(1, (4 - w.sayT) / 1.2);
+    g.globalAlpha = a; g.fillStyle = '#f3e6d0'; g.textAlign = 'center';
+    g.font = "italic 15px Georgia, 'Times New Roman', serif"; // already scaled by houseK in this transform
+    const lx = (Math.min(Math.max(p0.x, 150), W - 150) - p0.x) / houseK(); // keep the line on screen at the edges
+    g.fillText(w.say, lx, -66 - w.sayT * 6); g.globalAlpha = 1;
+  }
   if (!open) { g.fillStyle = '#5a4a3a'; g.fillRect(p.x - 15, p.y - 15 - lift, 30, 30); g.fillStyle = '#463a2e'; g.fillRect(p.x - 1, p.y - 15 - lift, 2, 30); }
   else if (w.shut && !w.lit) { g.strokeStyle = 'rgba(255,220,160,.6)'; g.lineWidth = 2; g.strokeRect(p.x - 16, p.y - 16 - lift, 32, 32); }
   g.restore();
@@ -264,7 +298,7 @@ function draw() {
 
 let last = performance.now();
 function frame(now) {
-  const dt = Math.min(0.05, (now - last) / 1000); last = now;
+  const dt = Math.max(0, Math.min(0.05, (now - last) / 1000)); last = now; // 1st rAF stamp can precede `last`
   update(dt); draw(); requestAnimationFrame(frame);
 }
 requestAnimationFrame(frame);
