@@ -16,9 +16,10 @@ lonely start, warmth that grows with every person you reach, and a release.
 - Mac build: `./mac/build.sh` makes `dist/Thread-mac.zip` (universal .app, native WKWebView shell around `web/`).
   Self-check: `THREAD_SNAPSHOT=/tmp/t.png dist/Thread.app/Contents/MacOS/Thread` renders the game to a PNG and quits.
 - Windows build: `./win/build.sh` makes `dist/Thread-windows.zip` (Electron win32-x64 around the same `web/`; unzip and run `Thread.exe`, F11 toggles fullscreen).
-  Self-check: `THREAD_SNAPSHOT=C:\\t.png Thread.exe` renders the game to a PNG and quits.
+  Self-check: `THREAD_SNAPSHOT=C:\\t.png Thread.exe` renders the game to a PNG and quits; add `THREAD_SNAPSHOT_QUERY=autoplay THREAD_SNAPSHOT_MS=14000` to capture the attract mode with whispers (0.6.3 checked this way on a real Windows 11 laptop).
 - Check: `node tests/reach.mjs` proves every level is solvable on 5 screen sizes.
 - Whispers (0.6): each person speaks one short line when their window warms (22 windows, 22 lines, `web/game.js` WHISPERS); `node tests/whispers.mjs` checks one per window, unique, short enough to read. `?autoplay` now starts by itself after the title.
+- 0.6.3: whispers are drawn after every house and the thread, so the next house to the right no longer cuts a line off; `node tests/whisper-on-top.mjs` records the canvas calls of one frame and fails if a house body is painted after a whisper.
 - Music: original, generated live with the Web Audio API in F minor at 80 BPM. The theme track is not included.
 
 AI disclosure: the code was written with the help of an AI coding assistant (Claude). No AI-generated images or audio.

@@ -217,15 +217,20 @@ function house(p0, w, warm) {
   g.fillStyle = glow ? `rgb(255,${180 + glow * 30},${100 + glow * 40})` : '#3a4466';
   g.fillRect(p.x - 13, p.y - 13 - lift, 26, 26);
   if (glow) person(p.x, p.y - lift, w, glow);
-  if (w.say && w.sayT < 4 && state === 'play') { // the person speaks once, above their house, and the words drift up and fade
-    w.sayT += 1 / 60; const a = Math.min(1, w.sayT * 2) * Math.min(1, (4 - w.sayT) / 1.2);
-    g.globalAlpha = a; g.fillStyle = '#f3e6d0'; g.textAlign = 'center';
-    g.font = "italic 15px Georgia, 'Times New Roman', serif"; // already scaled by houseK in this transform
-    const lx = (Math.min(Math.max(p0.x, 150), W - 150) - p0.x) / houseK(); // keep the line on screen at the edges
-    g.fillText(w.say, lx, -66 - w.sayT * 6); g.globalAlpha = 1;
-  }
   if (!open) { g.fillStyle = '#5a4a3a'; g.fillRect(p.x - 15, p.y - 15 - lift, 30, 30); g.fillStyle = '#463a2e'; g.fillRect(p.x - 1, p.y - 15 - lift, 2, 30); }
   else if (w.shut && !w.lit) { g.strokeStyle = 'rgba(255,220,160,.6)'; g.lineWidth = 2; g.strokeRect(p.x - 16, p.y - 16 - lift, 32, 32); }
+  g.restore();
+}
+// the person speaks once, above their house, and the words drift up and fade; drawn after every
+// house and the thread so the next houses to the right never cut the line off
+function whisper(p0, w) {
+  if (!w.say || w.sayT >= 4 || state !== 'play') return;
+  g.save(); g.translate(p0.x, p0.y - w.lift * H); g.scale(houseK(), houseK());
+  w.sayT += 1 / 60; const a = Math.min(1, w.sayT * 2) * Math.min(1, (4 - w.sayT) / 1.2);
+  g.globalAlpha = a; g.fillStyle = '#f3e6d0'; g.textAlign = 'center';
+  g.font = "italic 15px Georgia, 'Times New Roman', serif"; // already scaled by houseK in this transform
+  const lx = (Math.min(Math.max(p0.x, 150), W - 150) - p0.x) / houseK(); // keep the line on screen at the edges
+  g.fillText(w.say, lx, -66 - w.sayT * 6); g.globalAlpha = 1;
   g.restore();
 }
 // the person behind a stitched window: adult, child or a couple (fixed per window), fades in with
@@ -278,6 +283,7 @@ function draw() {
       sag(a, b, 30);
     }
     g.stroke();
+    wins.forEach(w => whisper(P(w), w));
     if (state === 'play') {
       const a = P(anchors[anchors.length - 1]), R = reach * Math.min(W, H) * 1.6;
       const d = Math.hypot(needle.x - a.x, needle.y - a.y);

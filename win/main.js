@@ -8,17 +8,18 @@ app.whenReady().then(() => {
     width: 1280, height: 800, backgroundColor: '#0b1020', title: 'Thread',
     webPreferences: { contextIsolation: true, autoplayPolicy: 'no-user-gesture-required' },
   });
-  win.loadFile(path.join(__dirname, 'web', 'index.html'));
+  // THREAD_SNAPSHOT_QUERY=autoplay loads ?autoplay (attract mode) for the self-check below.
+  win.loadFile(path.join(__dirname, 'web', 'index.html'), { search: process.env.THREAD_SNAPSHOT_QUERY || '' });
   win.webContents.on('before-input-event', (e, input) => {
     if (input.type === 'keyDown' && input.key === 'F11') win.setFullScreen(!win.isFullScreen());
   });
-  // Self-check: THREAD_SNAPSHOT=out.png renders the loaded game to a PNG and quits.
+  // Self-check: THREAD_SNAPSHOT=out.png renders the loaded game to a PNG and quits (after THREAD_SNAPSHOT_MS, default 2500).
   if (process.env.THREAD_SNAPSHOT) {
     win.webContents.once('did-finish-load', () => setTimeout(async () => {
       const img = await win.webContents.capturePage();
       require('fs').writeFileSync(process.env.THREAD_SNAPSHOT, img.toPNG());
       app.exit(0);
-    }, 2500));
+    }, +process.env.THREAD_SNAPSHOT_MS || 2500));
   }
 });
 app.on('window-all-closed', () => app.quit());
